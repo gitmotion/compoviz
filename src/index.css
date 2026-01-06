@@ -1,0 +1,408 @@
+@import "tailwindcss";
+
+/* Cyber-Night Theme Custom Properties */
+@theme {
+  --color-cyber-bg: #0a0e17;
+  --color-cyber-surface: #111827;
+  --color-cyber-surface-light: #1f2937;
+  --color-cyber-border: #374151;
+  --color-cyber-border-glow: #3b82f6;
+  --color-cyber-text: #e5e7eb;
+  --color-cyber-text-muted: #9ca3af;
+  --color-cyber-accent: #3b82f6;
+  --color-cyber-accent-hover: #60a5fa;
+  --color-cyber-success: #10b981;
+  --color-cyber-warning: #f59e0b;
+  --color-cyber-error: #ef4444;
+  --color-cyber-purple: #8b5cf6;
+  --color-cyber-pink: #ec4899;
+  --color-cyber-cyan: #06b6d4;
+}
+
+/* Base Styles */
+html {
+  background-color: var(--color-cyber-bg);
+  color: var(--color-cyber-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  @apply m-0 min-h-screen;
+  background: linear-gradient(135deg, var(--color-cyber-bg) 0%, #0f172a 50%, #1e1b4b 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cyber-surface);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-cyber-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyber-accent);
+}
+
+/* Glassmorphism Utility */
+.glass {
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.glass-light {
+  background: rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(55, 65, 81, 0.3);
+}
+
+/* Glow Effects */
+.glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3),
+    0 0 40px rgba(59, 130, 246, 0.1);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.glow-error {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Form Element Styling */
+input,
+textarea,
+select {
+  @apply bg-cyber-surface border border-cyber-border rounded-lg px-3 py-2 text-cyber-text;
+  @apply focus:outline-none focus:border-cyber-accent focus:ring-1 focus:ring-cyber-accent;
+  @apply transition-all duration-200;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-cyber-text-muted);
+}
+
+/* Button Base Styles */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyber-bg;
+}
+
+.btn-primary {
+  @apply bg-cyber-accent text-white hover:bg-cyber-accent-hover focus:ring-cyber-accent;
+}
+
+.btn-secondary {
+  @apply bg-cyber-surface-light text-cyber-text border border-cyber-border;
+  @apply hover:bg-cyber-border hover:border-cyber-accent;
+}
+
+.btn-danger {
+  @apply bg-cyber-error/20 text-cyber-error border border-cyber-error/50;
+  @apply hover:bg-cyber-error hover:text-white;
+}
+
+/* Code Preview Styling */
+.code-preview {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  tab-size: 2;
+}
+
+/* YAML Syntax Highlighting */
+.yaml-key {
+  color: #60a5fa;
+}
+
+.yaml-value {
+  color: #34d399;
+}
+
+.yaml-string {
+  color: #fbbf24;
+}
+
+.yaml-number {
+  color: #f472b6;
+}
+
+.yaml-comment {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.yaml-boolean {
+  color: #c084fc;
+}
+
+/* Mermaid Diagram Container - Premium Styling */
+.mermaid-container {
+  @apply w-full h-full overflow-hidden relative;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%),
+    linear-gradient(135deg, #0a0e17 0%, #0f172a 50%, #1e1b4b 100%);
+}
+
+/* Animated grid overlay */
+.mermaid-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  animation: gridPulse 8s ease-in-out infinite;
+}
+
+@keyframes gridPulse {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.mermaid-container svg {
+  @apply w-full h-full;
+  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.1));
+}
+
+/* Subgraph styling */
+.mermaid-container .cluster rect {
+  fill: rgba(30, 41, 59, 0.6) !important;
+  stroke: rgba(100, 116, 139, 0.4) !important;
+  stroke-width: 2px !important;
+  rx: 16 !important;
+  ry: 16 !important;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.mermaid-container .cluster span {
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.5px;
+}
+
+/* Service nodes - Blue glow */
+.mermaid-container .node.service rect,
+.mermaid-container .node rect {
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.4));
+  transition: all 0.3s ease;
+}
+
+.mermaid-container .node:hover rect {
+  filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.7));
+  stroke-width: 3px !important;
+}
+
+/* Network nodes - Emerald glow */
+.mermaid-container .node.network circle {
+  filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.5));
+}
+
+.mermaid-container .node.network:hover circle {
+  filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.8));
+}
+
+/* Volume nodes - Amber glow */
+.mermaid-container .node.volume path {
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
+}
+
+/* All nodes interactive cursor */
+.mermaid-container .node {
+  cursor: pointer;
+}
+
+/* Edge labels - aggressive styling for readability */
+.mermaid-container .edgeLabel,
+.mermaid-container .edgeLabel rect,
+.mermaid-container .edgeLabel span,
+.mermaid-container .edgeLabel p,
+.mermaid-container .edgePath+.edgeLabel,
+.mermaid-container g.edgeLabel,
+.mermaid-container g.edgeLabel foreignObject,
+.mermaid-container g.edgeLabel foreignObject div {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+.mermaid-container .edgeLabel rect {
+  fill: #0f172a !important;
+  stroke: #3b82f6 !important;
+  stroke-width: 2px !important;
+  rx: 6 !important;
+  ry: 6 !important;
+}
+
+.mermaid-container .edgeLabel span,
+.mermaid-container .edgeLabel p,
+.mermaid-container .edgeLabel foreignObject div {
+  color: #ffffff !important;
+  background: transparent !important;
+  padding: 4px 10px !important;
+}
+
+/* Also target the text directly */
+.mermaid-container .edgeLabel text,
+.mermaid-container .edgeLabel tspan {
+  fill: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+/* Edge paths */
+.mermaid-container .flowchart-link {
+  stroke-linecap: round;
+  transition: stroke-width 0.2s ease;
+}
+
+/* Arrow markers */
+.mermaid-container marker path {
+  fill: currentColor;
+}
+
+/* Node text styling */
+.mermaid-container .nodeLabel {
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+.mermaid-container .nodeLabel div {
+  line-height: 1.4;
+}
+
+/* Tree View Styling */
+.tree-item {
+  @apply flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer;
+  @apply transition-all duration-150;
+  @apply hover:bg-cyber-surface-light;
+}
+
+.tree-item.active {
+  @apply bg-cyber-accent/20 border-l-2 border-cyber-accent;
+}
+
+.tree-item .badge {
+  @apply px-2 py-0.5 text-xs rounded-full;
+}
+
+.badge-error {
+  @apply bg-cyber-error/20 text-cyber-error;
+}
+
+.badge-warning {
+  @apply bg-cyber-warning/20 text-cyber-warning;
+}
+
+.badge-success {
+  @apply bg-cyber-success/20 text-cyber-success;
+}
+
+/* Collapsible Section */
+.collapsible-header {
+  @apply flex items-center justify-between px-4 py-3 cursor-pointer;
+  @apply bg-cyber-surface-light/50 hover:bg-cyber-surface-light;
+  @apply border-b border-cyber-border/50;
+  @apply transition-colors duration-150;
+}
+
+/* Tooltip */
+.tooltip {
+  @apply relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  @apply absolute bottom-full left-1/2 -translate-x-1/2 mb-2;
+  @apply px-2 py-1 text-xs rounded bg-cyber-surface-light text-cyber-text;
+  @apply opacity-0 pointer-events-none transition-opacity duration-200;
+  @apply whitespace-nowrap z-50;
+}
+
+.tooltip:hover::after {
+  @apply opacity-100;
+}
+
+/* Drag and Drop Zone */
+.drop-zone {
+  @apply border-2 border-dashed border-cyber-border rounded-xl;
+  @apply transition-all duration-200;
+}
+
+.drop-zone.active {
+  @apply border-cyber-accent bg-cyber-accent/10;
+}
+
+/* Panel Resize Handle */
+.resize-handle {
+  @apply w-1 cursor-col-resize bg-cyber-border/50;
+  @apply hover:bg-cyber-accent transition-colors duration-150;
+}
