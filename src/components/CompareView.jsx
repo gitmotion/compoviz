@@ -208,7 +208,7 @@ export default function CompareView() {
     };
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full w-full flex flex-col">
             {/* Header */}
             <div className="p-4 border-b border-cyber-border/50 glass">
                 <div className="flex items-center justify-between mb-4">
@@ -247,8 +247,8 @@ export default function CompareView() {
                             <div
                                 key={project.id}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${idx === 0 ? 'bg-blue-500/10 border-blue-500/30' :
-                                        idx === 1 ? 'bg-green-500/10 border-green-500/30' :
-                                            'bg-orange-500/10 border-orange-500/30'
+                                    idx === 1 ? 'bg-green-500/10 border-green-500/30' :
+                                        'bg-orange-500/10 border-orange-500/30'
                                     }`}
                             >
                                 <span className="text-lg">{['🔵', '🟢', '🟠'][idx]}</span>
