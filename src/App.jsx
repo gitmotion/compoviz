@@ -10,6 +10,7 @@ import { ComposeContext, composeReducer, initialState } from './hooks/useCompose
 import { useHistoryReducer } from './hooks/useHistory';
 import { serviceTemplates, getTemplateNames } from './data/templates';
 import CompareView from './components/CompareView';
+import { Analytics } from '@vercel/analytics/react';
 
 // Initialize Mermaid with enhanced styling
 mermaid.initialize({
@@ -739,6 +740,7 @@ export default function App() {
   return (
     <ComposeContext.Provider value={{ state, dispatch }}>
       <div className="h-screen flex flex-col overflow-hidden">
+        <Analytics />
         {/* Header */}
         <header className="glass flex items-center justify-between px-4 py-3 border-b border-cyber-border/50">
           <div className="flex items-center gap-4">
