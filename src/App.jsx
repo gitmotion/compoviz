@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import mermaid from 'mermaid';
-import { Server, Network, Database, Key, FileText, Plus, Trash2, ChevronDown, ChevronRight, Download, Upload, Search, ZoomIn, ZoomOut, RotateCcw, AlertCircle, CheckCircle, Copy, Settings, Cpu, HardDrive, Heart, Tag, Globe, Lock, FolderOpen, X, Menu, Eye, Code, Layers, Undo2, Redo2, Sparkles, Terminal, Play } from 'lucide-react';
+import { Server, Network, Database, Key, FileText, Plus, Trash2, ChevronDown, ChevronRight, Download, Upload, Search, ZoomIn, ZoomOut, RotateCcw, AlertCircle, CheckCircle, Copy, Settings, Cpu, HardDrive, Heart, Tag, Globe, Lock, FolderOpen, X, Menu, Eye, Code, Layers, Undo2, Redo2, Sparkles, Terminal, Play, GitCompare } from 'lucide-react';
 
 // Import utilities and hooks
 import { generateYaml, parseYaml } from './utils/yaml';
@@ -9,6 +9,7 @@ import { generateMermaidGraph } from './utils/mermaid';
 import { ComposeContext, composeReducer, initialState } from './hooks/useCompose';
 import { useHistoryReducer } from './hooks/useHistory';
 import { serviceTemplates, getTemplateNames } from './data/templates';
+import CompareView from './components/CompareView';
 
 // Initialize Mermaid with enhanced styling
 mermaid.initialize({
@@ -61,6 +62,22 @@ const Input = ({ label, value, onChange, placeholder, tooltip }) => (
       {tooltip && <span className="tooltip" data-tooltip={tooltip}><AlertCircle size={12} /></span>}
     </label>
     <input type="text" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full" />
+  </div>
+);
+
+const Select = ({ label, value, onChange, options, placeholder, tooltip }) => (
+  <div className="space-y-1">
+    <label className="text-xs text-cyber-text-muted flex items-center gap-1">{label}
+      {tooltip && <span className="tooltip" data-tooltip={tooltip}><AlertCircle size={12} /></span>}
+    </label>
+    <select value={value || ''} onChange={e => onChange(e.target.value)} className="w-full">
+      {placeholder && <option value="">{placeholder}</option>}
+      {options.map(opt => (
+        <option key={typeof opt === 'string' ? opt : opt.value} value={typeof opt === 'string' ? opt : opt.value}>
+          {typeof opt === 'string' ? opt : opt.label}
+        </option>
+      ))}
+    </select>
   </div>
 );
 
@@ -182,7 +199,19 @@ const ServiceEditor = ({ name, service, onUpdate, allNetworks, allServices, allV
       <Section title="General" icon={Settings}>
         <Input label="Image" value={service.image} onChange={v => update('image', v)} placeholder="nginx:latest" tooltip="Docker image to use" />
         <Input label="Container Name" value={service.container_name} onChange={v => update('container_name', v)} placeholder="my-container" />
-        <Input label="Restart Policy" value={service.restart} onChange={v => update('restart', v)} placeholder="unless-stopped" />
+        <Select
+          label="Restart Policy"
+          value={service.restart}
+          onChange={v => update('restart', v)}
+          placeholder="Select restart policy..."
+          tooltip="When to restart the container"
+          options={[
+            { value: 'no', label: 'no - Never restart' },
+            { value: 'always', label: 'always - Always restart' },
+            { value: 'on-failure', label: 'on-failure - Restart on failure' },
+            { value: 'unless-stopped', label: 'unless-stopped - Restart unless stopped' },
+          ]}
+        />
       </Section>
 
       <Section title="Build" icon={FolderOpen} defaultOpen={false}>
@@ -272,7 +301,19 @@ const NetworkEditor = ({ name, network, onUpdate }) => {
         <Badge type="success">Network</Badge>
       </div>
       <Section title="Configuration" icon={Settings}>
-        <Input label="Driver" value={network.driver} onChange={v => update('driver', v)} placeholder="bridge" />
+        <Select
+          label="Driver"
+          value={network.driver}
+          onChange={v => update('driver', v)}
+          placeholder="Select network driver..."
+          options={[
+            { value: 'bridge', label: 'bridge - Default bridge network' },
+            { value: 'host', label: 'host - Use host networking' },
+            { value: 'overlay', label: 'overlay - Multi-host overlay' },
+            { value: 'macvlan', label: 'macvlan - MAC address assignment' },
+            { value: 'none', label: 'none - No networking' },
+          ]}
+        />
         <Input label="External Name" value={network.name} onChange={v => update('name', v)} placeholder="external-network-name" />
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={network.external || false} onChange={e => update('external', e.target.checked)} className="rounded" />External Network</label>
       </Section>
@@ -296,7 +337,17 @@ const VolumeEditor = ({ name, volume, onUpdate }) => {
         <Badge type="warning">Volume</Badge>
       </div>
       <Section title="Configuration" icon={Settings}>
-        <Input label="Driver" value={volume.driver} onChange={v => update('driver', v)} placeholder="local" />
+        <Select
+          label="Driver"
+          value={volume.driver}
+          onChange={v => update('driver', v)}
+          placeholder="Select volume driver..."
+          options={[
+            { value: 'local', label: 'local - Local storage' },
+            { value: 'nfs', label: 'nfs - Network File System' },
+            { value: 'tmpfs', label: 'tmpfs - Temporary filesystem' },
+          ]}
+        />
         <Input label="External Name" value={volume.name} onChange={v => update('name', v)} placeholder="external-volume-name" />
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={volume.external || false} onChange={e => update('external', e.target.checked)} className="rounded" />External Volume</label>
       </Section>
@@ -658,6 +709,7 @@ export default function App() {
             <div className="flex gap-1 glass rounded-lg p-1">
               <button onClick={() => setView('editor')} className={`px-3 py-1.5 rounded text-sm transition-colors ${view === 'editor' ? 'bg-cyber-accent text-white' : 'text-cyber-text-muted hover:text-cyber-text'}`}><Code size={14} className="inline mr-1" />Editor</button>
               <button onClick={() => setView('diagram')} className={`px-3 py-1.5 rounded text-sm transition-colors ${view === 'diagram' ? 'bg-cyber-accent text-white' : 'text-cyber-text-muted hover:text-cyber-text'}`}><Eye size={14} className="inline mr-1" />Diagram</button>
+              <button onClick={() => setView('compare')} className={`px-3 py-1.5 rounded text-sm transition-colors ${view === 'compare' ? 'bg-cyber-purple text-white' : 'text-cyber-text-muted hover:text-cyber-text'}`}><GitCompare size={14} className="inline mr-1" />Compare</button>
             </div>
             {view === 'diagram' && <IconButton icon={Download} onClick={handleExportDiagram} title="Export Diagram" />}
           </div>
@@ -693,7 +745,10 @@ export default function App() {
 
           {/* Main Panel */}
           <main className="flex-1 flex overflow-hidden">
-            {view === 'editor' ? (
+            {view === 'compare' ? (
+              /* Compare View - Takes full width */
+              <CompareView />
+            ) : view === 'editor' ? (
               <>
                 {/* Editor Panel */}
                 <div className="flex-1 overflow-auto p-6">{renderEditor()}</div>

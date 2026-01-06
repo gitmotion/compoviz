@@ -29,6 +29,9 @@ export const generateMermaidGraph = (state) => {
     graph += `  %% Secret nodes - Purple secure\n`;
     graph += `  classDef secret fill:#581c87,stroke:#a855f7,stroke-width:2px,color:#fff\n`;
 
+    graph += `  %% Config nodes - Cyan config\n`;
+    graph += `  classDef config fill:#164e63,stroke:#06b6d4,stroke-width:2px,color:#fff\n`;
+
     graph += `  %% Edge styles\n`;
     graph += `  linkStyle default stroke:#64748b,stroke-width:2px\n`;
 
@@ -76,8 +79,9 @@ export const generateMermaidGraph = (state) => {
         graph += `  subgraph volumes [" 💾 VOLUMES "]\n`;
         graph += `    direction ${direction}\n`;
         Object.entries(state.volumes || {}).forEach(([name, vol]) => {
-            const driver = vol.driver || 'local';
-            const external = vol.external ? '🔗' : '';
+            // vol can be null in compose files (empty volume definition)
+            const driver = vol?.driver || 'local';
+            const external = vol?.external ? '🔗' : '';
             graph += `    vol_${name}[("${external}${name}<br/><small>${driver}</small>")]:::volume\n`;
         });
         graph += `  end\n\n`;
@@ -93,11 +97,23 @@ export const generateMermaidGraph = (state) => {
         graph += `  end\n\n`;
     }
 
+    // Generate configs nodes
+    const configCount = Object.keys(state.configs || {}).length;
+    if (configCount > 0) {
+        graph += `  subgraph configs [" ⚙️ CONFIGS "]\n`;
+        Object.keys(state.configs || {}).forEach(name => {
+            graph += `    cfg_${name}[/"📄 ${name}"/]:::config\n`;
+        });
+        graph += `  end\n\n`;
+    }
+
     // Generate relationships with styled edges
     let edgeIndex = 0;
     const dependsOnEdges = [];
     const networkEdges = [];
     const volumeEdges = [];
+    const secretEdges = [];
+    const configEdges = [];
 
     Object.entries(state.services || {}).forEach(([name, svc]) => {
         // Dependency edges (thick pink arrow)
@@ -124,6 +140,24 @@ export const generateMermaidGraph = (state) => {
                 volumeEdges.push(edgeIndex++);
             }
         });
+
+        // Secrets connections (purple dotted)
+        normalizeArray(svc.secrets).forEach(sec => {
+            const secName = typeof sec === 'string' ? sec : sec?.source;
+            if (secName && state.secrets && state.secrets[secName]) {
+                graph += `  sec_${secName} -.-> ${name}\n`;
+                secretEdges.push(edgeIndex++);
+            }
+        });
+
+        // Configs connections (cyan dotted)
+        normalizeArray(svc.configs).forEach(cfg => {
+            const cfgName = typeof cfg === 'string' ? cfg : cfg?.source;
+            if (cfgName && state.configs && state.configs[cfgName]) {
+                graph += `  cfg_${cfgName} -.-> ${name}\n`;
+                configEdges.push(edgeIndex++);
+            }
+        });
     });
 
     // Apply edge styles
@@ -135,6 +169,142 @@ export const generateMermaidGraph = (state) => {
     }
     if (volumeEdges.length > 0) {
         graph += `  linkStyle ${volumeEdges.join(',')} stroke:#fbbf24,stroke-width:2px,stroke-dasharray:3\n`;
+    }
+    if (secretEdges.length > 0) {
+        graph += `  linkStyle ${secretEdges.join(',')} stroke:#a855f7,stroke-width:2px,stroke-dasharray:3\n`;
+    }
+    if (configEdges.length > 0) {
+        graph += `  linkStyle ${configEdges.join(',')} stroke:#06b6d4,stroke-width:2px,stroke-dasharray:3\n`;
+    }
+
+    return graph;
+};
+
+// Project colors for multi-project view
+const PROJECT_COLORS = [
+    { bg: '#1e3a8a', stroke: '#3b82f6', name: 'blue' },   // Blue
+    { bg: '#065f46', stroke: '#10b981', name: 'green' },  // Green
+    { bg: '#7c2d12', stroke: '#f97316', name: 'orange' }, // Orange
+];
+
+/**
+ * Generates a Mermaid flowchart for multiple projects.
+ * @param {Array<{id: string, name: string, content: object}>} projects - Array of projects
+ * @param {Array} conflicts - Array of conflict results from comparison
+ * @returns {string} The Mermaid graph definition
+ */
+export const generateMultiProjectGraph = (projects, conflicts = []) => {
+    if (!projects || projects.length === 0) {
+        return 'flowchart TB\n  empty["No projects loaded"]';
+    }
+
+    let graph = `flowchart LR\n`;
+
+    // Class definitions for each project
+    projects.forEach((project, idx) => {
+        const color = PROJECT_COLORS[idx % PROJECT_COLORS.length];
+        graph += `  classDef project${idx} fill:${color.bg},stroke:${color.stroke},stroke-width:2px,color:#fff,rx:8,ry:8\n`;
+    });
+
+    // Conflict highlighting
+    graph += `  classDef conflict fill:#991b1b,stroke:#ef4444,stroke-width:3px,color:#fff\n`;
+    graph += `  classDef shared fill:#4c1d95,stroke:#a78bfa,stroke-width:2px,color:#fff,stroke-dasharray:5\n`;
+    graph += `  classDef network fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff\n`;
+    graph += `  classDef volume fill:#78350f,stroke:#f59e0b,stroke-width:2px,color:#fff\n`;
+    graph += `\n`;
+
+    // Build conflict lookup for quick access
+    const conflictPorts = new Set();
+    const conflictContainers = new Set();
+    const sharedNetworks = new Set();
+
+    conflicts.forEach(c => {
+        if (c.category === 'port' && c.type === 'conflict') {
+            c.details?.forEach(d => conflictPorts.add(`${d.project}:${d.service}`));
+        }
+        if (c.category === 'container_name' && c.type === 'conflict') {
+            c.details?.forEach(d => conflictContainers.add(`${d.project}:${d.service}`));
+        }
+        if (c.category === 'network' && c.type === 'shared') {
+            sharedNetworks.add(c.details?.networkName);
+        }
+    });
+
+    // Collect all networks and volumes across projects for shared rendering
+    const allNetworks = new Map(); // networkName -> [projectIdx]
+    const allVolumes = new Map(); // volumeName -> [projectIdx]
+
+    projects.forEach((project, idx) => {
+        const content = project.content || {};
+        Object.keys(content.networks || {}).forEach(netName => {
+            if (!allNetworks.has(netName)) allNetworks.set(netName, []);
+            allNetworks.get(netName).push(idx);
+        });
+        Object.keys(content.volumes || {}).forEach(volName => {
+            if (!allVolumes.has(volName)) allVolumes.set(volName, []);
+            allVolumes.get(volName).push(idx);
+        });
+    });
+
+    // Render each project as a subgraph
+    projects.forEach((project, idx) => {
+        const content = project.content || {};
+        const projectPrefix = `p${idx}_`;
+        const emoji = ['🔵', '🟢', '🟠'][idx % 3];
+
+        graph += `  subgraph ${projectPrefix}main ["${emoji} ${project.name || 'Project ' + (idx + 1)}"]\n`;
+        graph += `    direction TB\n`;
+
+        // Services
+        Object.entries(content.services || {}).forEach(([serviceName, svc]) => {
+            const nodeId = `${projectPrefix}${serviceName}`;
+            const img = svc.image ? svc.image.split(':')[0] : 'build';
+            const portsArr = normalizeArray(svc.ports);
+            const portLabel = portsArr.length > 0 ? `<br/><small>🔌 ${portsArr[0]}</small>` : '';
+
+            // Check if this service has conflicts
+            const serviceKey = `${project.name}:${serviceName}`;
+            const hasConflict = conflictPorts.has(serviceKey) || conflictContainers.has(serviceKey);
+            const nodeClass = hasConflict ? 'conflict' : `project${idx}`;
+
+            graph += `    ${nodeId}["<b>${serviceName}</b><br/><small>${img}</small>${portLabel}"]:::${nodeClass}\n`;
+        });
+
+        graph += `  end\n\n`;
+    });
+
+    // Render shared networks (outside project subgraphs)
+    const sharedNetworksList = [...allNetworks.entries()].filter(([_, projs]) => projs.length > 1);
+    if (sharedNetworksList.length > 0) {
+        graph += `  subgraph shared_infra [" 🌐 SHARED NETWORKS "]\n`;
+        sharedNetworksList.forEach(([netName, _]) => {
+            graph += `    shared_net_${netName}(("${netName}")):::shared\n`;
+        });
+        graph += `  end\n\n`;
+    }
+
+    // Edge connections for shared networks
+    let edgeIdx = 0;
+    const sharedEdges = [];
+
+    projects.forEach((project, idx) => {
+        const content = project.content || {};
+        const projectPrefix = `p${idx}_`;
+
+        Object.entries(content.services || {}).forEach(([serviceName, svc]) => {
+            normalizeArray(svc.networks).forEach(netName => {
+                if (allNetworks.get(netName)?.length > 1) {
+                    // Connect to shared network
+                    graph += `  ${projectPrefix}${serviceName} -.-> shared_net_${netName}\n`;
+                    sharedEdges.push(edgeIdx++);
+                }
+            });
+        });
+    });
+
+    // Style shared edges
+    if (sharedEdges.length > 0) {
+        graph += `  linkStyle ${sharedEdges.join(',')} stroke:#a78bfa,stroke-width:2px,stroke-dasharray:5\n`;
     }
 
     return graph;
