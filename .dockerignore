@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# Agent internal files
-.agent/
+# Docker build cache
+.docker

@@ -1,0 +1,18 @@
+# For local development and testing of the Docker image
+name: compoviz
+
+services:
+  compoviz:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: compoviz
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    labels:
+      # Runtipi-compatible labels
+      runtipi.managed: "true"
+      traefik.enable: "true"
+      traefik.http.routers.compoviz.rule: PathPrefix("/")
+      traefik.http.services.compoviz.loadbalancer.server.port: "80"

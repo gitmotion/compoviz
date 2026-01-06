@@ -65,6 +65,43 @@
 
 ---
 
+## 🐳 Docker Deployment
+
+The easiest way to run Compoviz is with Docker. No Node.js required!
+
+### Using Docker Compose (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/compoviz.git
+cd compoviz
+
+# Build and run
+docker compose up -d
+
+# Access the app at http://localhost:8080
+```
+
+### Using Docker CLI
+
+```bash
+# Build the image
+docker build -t compoviz .
+
+# Run the container
+docker run -d -p 8080:80 --name compoviz compoviz
+
+# Access the app at http://localhost:8080
+```
+
+### Using Pre-built Image (Coming Soon)
+
+```bash
+docker run -d -p 8080:80 ghcr.io/yourusername/compoviz:latest
+```
+
+---
+
 ## 🛠️ Tech Stack
 
 *   **Frontend**: React + Vite
