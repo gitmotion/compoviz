@@ -1,13 +1,42 @@
-# 🐳 Docker Compose Architect (Compoviz)
+<p align="center">
+  <a href="https://compoviz.pro">
+    <img src="public/banner.png" alt="Compoviz Banner" />
+  </a>
+</p>
+</p>
 
-> Transform your Docker infrastructure from static YAML to dynamic, visual architecture.
+<h1 align="center">🐳 Docker Compose Architect (Compoviz)</h1>
 
-[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![React](https://img.shields.io/badge/react-%2320232b.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
-[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Mermaid](https://img.shields.io/badge/mermaid-%23ff5f5f.svg?style=for-the-badge&logo=mermaid&logoColor=white)](https://mermaid.js.org/)
+<h3 align="center">
+  <a href="https://compoviz.pro">Live Demo</a> |
+  <a href="#-docker-deployment">Self-Host</a> |
+  <a href="#-contributing">Contributing</a>
+</h3>
 
-**Docker Compose Architect** is a premium, web-based visual editor and architect tool for Docker Compose files. Whether you're onboarding newcomers to a complex microservices mesh or debugging port collisions across multiple legacy projects, Compoviz provides the clarity you need.
+<p align="center">
+  <strong>An open source visual Docker Compose architect.</strong><br/>
+  Transform YAML into interactive architecture diagrams.
+</p>
+
+<p align="center">
+  <a href="https://github.com/adavesik/compoviz/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" />
+  </a>
+  <a href="https://github.com/adavesik/compoviz/stargazers">
+    <img src="https://img.shields.io/github/stars/adavesik/compoviz?style=flat&color=yellow" alt="GitHub Stars" />
+  </a>
+  <a href="https://github.com/adavesik/compoviz/issues">
+    <img src="https://img.shields.io/github/issues/adavesik/compoviz" alt="GitHub Issues" />
+  </a>
+</p>
+
+<br />
+
+<p align="center">
+  <img src="public/demo.png" alt="Compoviz Interface" width="100%" style="border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5);" />
+</p>
+
+<br />
 
 ---
 
@@ -32,7 +61,7 @@
 
 ### ⌨️ Developer Experience
 *   **Undo/Redo**: Full history management with `Ctrl+Z` / `Ctrl+Y` shortcuts.
-*   **Glassmorphism UI**: A stunning "Cyberpunk" dark mode interface designed for maximum focus.
+*   **Modern Dark UI**: A sleek dark mode interface designed for maximum focus.
 *   **Instant Export**: Export clean, optimized YAML ready for production.
 
 ---
@@ -105,7 +134,7 @@ docker run -d -p 8080:80 ghcr.io/adavesik/compoviz:latest
 ## 🛠️ Tech Stack
 
 *   **Frontend**: React + Vite
-*   **Styling**: Tailwind CSS (Custom "Cyber" Theme)
+*   **Styling**: Tailwind CSS (Custom Dark Theme)
 *   **Diagrams**: Mermaid.js (Enhanced)
 *   **Logic**: Custom hooks for history (`useHistory`) and state (`useCompose`, `useMultiProject`)
 *   **YAML Parsing**: js-yaml
