@@ -1142,3 +1142,18 @@ textarea::placeholder {
     display: none !important;
   }
 }
+
+/* ========================================
+   Ko-fi Widget Positioning
+   Raise higher to avoid overlap with UI
+   ======================================== */
+
+.floatingchat-container-wrap,
+.floatingchat-container-wrap-mo498 {
+  bottom: 100px !important;
+}
+
+/* Ensure the popup also opens from the correct position */
+.floating-chat-kofi-popup-iframe {
+  bottom: 100px !important;
+}
