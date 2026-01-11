@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { Server, Heart, FileText, Globe } from 'lucide-react';
+import { Heart, FileText, Globe } from 'lucide-react';
+import { getServiceIcon, renderServiceIcon } from '../../utils/iconUtils.jsx';
 
 /**
  * Custom node for Docker services in the visual builder.
@@ -18,6 +19,8 @@ const ServiceNode = memo(({ data, selected }) => {
         return p.published || p;
     }).join(', ');
 
+    const iconData = getServiceIcon(name, image);
+
     return (
         <div className={`builder-node service-node ${selected ? 'selected' : ''}`}>
             {/* Target handle (top) - for incoming dependencies */}
@@ -30,8 +33,8 @@ const ServiceNode = memo(({ data, selected }) => {
 
             {/* Header */}
             <div className="node-header service-header">
-                <Server size={14} className="node-icon" />
-                <span className="node-title">{name}</span>
+                {renderServiceIcon(iconData, 'node-icon')}
+                <span className="node-title ml-1">{name}</span>
             </div>
 
             {/* Body */}

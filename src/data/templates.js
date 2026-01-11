@@ -136,6 +136,51 @@ export const serviceTemplates = {
         },
         suggestedVolume: { name: 'rabbitmq_data', config: { driver: 'local' } },
     },
+    go: {
+        name: 'go-app',
+        config: {
+            build: { context: '.', dockerfile: 'Dockerfile' },
+            ports: ['8080:8080'],
+            restart: 'unless-stopped',
+        },
+    },
+    php: {
+        name: 'php-app',
+        config: {
+            image: 'php:8.2-fpm-alpine',
+            ports: ['9000:9000'],
+            volumes: ['.:/var/www/html'],
+            restart: 'unless-stopped',
+        },
+    },
+    apache: {
+        name: 'apache',
+        config: {
+            image: 'httpd:alpine',
+            ports: ['80:80'],
+            volumes: ['.:/usr/local/apache2/htdocs'],
+            restart: 'unless-stopped',
+        },
+    },
+    rust: {
+        name: 'rust-app',
+        config: {
+            build: { context: '.', dockerfile: 'Dockerfile' },
+            ports: ['8080:8080'],
+            restart: 'unless-stopped',
+        },
+    },
+    docker: {
+        name: 'docker-in-docker',
+        config: {
+            image: 'docker:dind',
+            privileged: true,
+            environment: { DOCKER_TLS_CERTDIR: '/certs' },
+            volumes: ['docker-certs:/certs'],
+            restart: 'unless-stopped',
+        },
+        suggestedVolume: { name: 'docker-certs', config: { driver: 'local' } },
+    },
 };
 
 /**

@@ -1,4 +1,5 @@
 import { normalizeArray } from './validation';
+import { getServiceEmoji } from './iconUtils.jsx';
 
 /**
  * Escape special characters for Graphviz labels
@@ -278,11 +279,8 @@ export const generateGraphviz = (state) => {
             const color = COLORS[tier] || COLORS.application;
             const img = svc.image ? svc.image.split(':')[0] : 'image';
 
-            // Icon
-            let icon = '';
-            if (tier === 'persistence') icon = '🛢️ ';
-            else if (tier === 'routing') icon = '🚦 ';
-            else if (svc.healthcheck) icon = '💚 ';
+            // Get service-specific icon from centralized utility
+            const icon = getServiceEmoji(name, svc.image) + ' ';
 
             const nodeDef = `
                 ${sanitizeId(name)} [
