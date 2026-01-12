@@ -4,9 +4,10 @@ import { getServiceEmoji } from './iconUtils.jsx';
 /**
  * Escape special characters for Graphviz labels
  */
-const escapeLabel = (str) => {
+export const escapeLabel = (str) => {
     if (!str) return '';
     return String(str)
+        .replace(/\\/g, '\\\\')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')

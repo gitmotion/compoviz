@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { generateGraphviz } from './graphviz';
+import { escapeLabel, generateGraphviz } from './graphviz';
 
 describe('graphviz utils', () => {
+    describe('escapeLabel', () => {
+        it('escapes backslashes for safe DOT labels', () => {
+            expect(escapeLabel('C:\\path\\to\\svc')).toBe('C:\\\\path\\\\to\\\\svc');
+        });
+    });
+
     describe('generateGraphviz', () => {
         it('returns empty diagram when no services present', () => {
             const dot = generateGraphviz({});

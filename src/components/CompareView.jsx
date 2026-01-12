@@ -4,6 +4,7 @@ import { useMultiProject } from '../hooks/useMultiProject';
 import { compareProjects, getComparisonSummary } from '../utils/comparison';
 import { renderDot, resetGraphviz } from '../utils/graphvizRenderer';
 import { generateMultiProjectGraphviz } from '../utils/graphviz';
+import { sanitizeSvg } from '../utils/sanitizeSvg';
 
 /**
  * Diagram view for multi-project comparison
@@ -25,7 +26,11 @@ const DiagramView = memo(({ projects, conflicts }) => {
                 const dot = generateMultiProjectGraphviz(projects, conflicts);
                 const svg = await renderDot(dot);
                 if (cancelled || !containerRef.current) return;
-                containerRef.current.innerHTML = svg;
+                const sanitizedSvg = sanitizeSvg(svg);
+                if (!sanitizedSvg) {
+                    throw new Error('Failed to sanitize SVG output');
+                }
+                containerRef.current.replaceChildren(sanitizedSvg);
 
                 // Style the SVG
                 const svgElement = containerRef.current.querySelector('svg');
