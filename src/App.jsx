@@ -19,7 +19,8 @@ import { IconButton } from './components/ui';
 
 // Feature Components
 import { ServiceEditor, NetworkEditor, VolumeEditor, SecretEditor, ConfigEditor } from './features/editor';
-import { ResourceTree, IssuesPanel } from './features/sidebar';
+import { ResourceTree } from './features/sidebar';
+import ErrorIndicator from './components/ErrorIndicator';
 import { GraphvizDiagram } from './features/diagram';
 import { CodePreview } from './features/code-preview';
 import { TemplateModal } from './components/modals';
@@ -275,6 +276,8 @@ export default function App() {
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyber-text-muted" />
               <input type="text" placeholder="Search resources..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 pr-4 py-2 w-48 lg:w-64 text-sm" />
             </div>
+            {/* Error Indicator */}
+            <ErrorIndicator errors={errors} onSelect={setSelected} />
             {/* View switcher - icons only on mobile */}
             <div className="header-view-buttons flex gap-1 glass rounded-lg p-1">
               <button onClick={() => setView('editor')} className={`px-2 md:px-3 py-1.5 rounded text-sm transition-colors flex items-center gap-1 ${view === 'editor' ? 'bg-cyber-accent text-white' : 'text-cyber-text-muted hover:text-cyber-text'}`}><Code size={14} /><span className="view-btn-text hidden md:inline">Editor</span></button>
@@ -319,7 +322,6 @@ export default function App() {
             <div className="flex-1 overflow-auto p-2">
               <ResourceTree state={state} selected={selected} onSelect={(sel) => { setSelected(sel); if (isMobile) setSidebarOpen(false); }} onAdd={handleAdd} onDelete={handleDelete} errors={errors} searchTerm={searchTerm} />
             </div>
-            <IssuesPanel errors={errors} onSelect={(sel) => { setSelected(sel); if (isMobile) setSidebarOpen(false); }} />
             {/* Spec Compliance Badge */}
             <div className="px-3 py-2 border-t border-cyber-border/50">
               <a
