@@ -1,7 +1,7 @@
 {
   "name": "compoviz",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:up": "docker compose -f docker-compose.local.yml up",
+    "docker:restart": "docker compose -f docker-compose.local.yml restart",
+    "docker:rebuild": "npm run docker:up -- --build",
+    "docker:down": "docker compose -f docker-compose.local.yml down",
+    "docker:image-rm": "docker image rm compoviz-local:latest",
+    "docker:prune": "docker builder prune -f",
+    "docker:clean": "npm run docker:down && npm run docker:image-rm && npm run docker:prune"
   },
   "engines": {
     "node": ">=20.19.0 || >=22.12.0"
