@@ -2,10 +2,10 @@ name: Docker Image Build and Push
 
 on:
   push:
-    branches: [ main ]
+    branches: [ gitmotion/dev ]
   pull_request:
     # Docker push will be skipped for PRs to main but still runs the CI and Build steps to verify the PR is valid
-    branches: [ main ]
+    branches: [ gitmotion/dev ]
   # Use below to trigger on PRs, releases or manual triggers
   # release: # Uncomment to trigger on releases for versioning
   #   types: [ published ]
