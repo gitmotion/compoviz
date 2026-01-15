@@ -1,11 +1,9 @@
-# For local development and testing of the Docker image
+# For docker deployment using image
 name: compoviz
 
 services:
-  compoviz:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  prod:
+    image: ghcr.io/adavesik/compoviz:latest
     container_name: compoviz
     restart: unless-stopped
     ports:
