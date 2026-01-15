@@ -70,6 +70,8 @@ export default function App() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [showMobileCode, setShowMobileCode] = useState(false);
+  const [codePreviewWidth, setCodePreviewWidth] = useState(384); // Default w-96 = 384px
+  const [isResizing, setIsResizing] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -89,6 +91,31 @@ export default function App() {
     setYamlCode(generateYaml(state));
     setErrors(validateState(state));
   }, [state]);
+
+  // Handle resize panel drag
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e) => {
+      const newWidth = window.innerWidth - e.clientX;
+      // Clamp between 280px and 600px
+      setCodePreviewWidth(Math.max(280, Math.min(600, newWidth)));
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   // Handlers
   const handleAdd = (type) => {
@@ -365,8 +392,28 @@ export default function App() {
               <>
                 {/* Editor Panel */}
                 <div className="flex-1 overflow-auto p-6">{renderEditor()}</div>
+                {/* Resize Handle */}
+                <div
+                  className={`hidden xl:flex w-1 cursor-col-resize bg-cyber-border/30 hover:bg-cyber-accent/50 transition-colors relative group ${isResizing ? 'bg-cyber-accent/70' : ''}`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setIsResizing(true);
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                  }}
+                >
+                  {/* Visual indicator dots */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-1 h-1 rounded-full bg-cyber-accent"></div>
+                    <div className="w-1 h-1 rounded-full bg-cyber-accent"></div>
+                    <div className="w-1 h-1 rounded-full bg-cyber-accent"></div>
+                  </div>
+                </div>
                 {/* Code Preview Panel */}
-                <div className="w-96 border-l border-cyber-border/50 glass-light hidden xl:flex flex-col">
+                <div
+                  className="border-l border-cyber-border/50 glass-light hidden xl:flex flex-col"
+                  style={{ width: codePreviewWidth }}
+                >
                   <CodePreview yaml={yamlCode} onYamlChange={handleYamlChange} onExport={handleExport} onImport={handleImport} />
                 </div>
               </>
