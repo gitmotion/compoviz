@@ -29,7 +29,7 @@ jobs:
       - name: Wait for ci.yml to pass
         uses: lewagon/wait-on-check-action@v1.4.1
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           check-name: 'lint-and-test' # Name of the job in ci.yml (must be renamed if changed in ci.yml)
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10  # seconds between checks
@@ -43,6 +43,7 @@ jobs:
       contents: read # allow job to read repo
       packages: write # allow job to publish/write packages (docker images)
       id-token: write # allow job to request idc token for secure auth
+      attestations: write # allow job to create attestations
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6 # v6 for node 24 support and secure git credential storage
@@ -89,10 +90,10 @@ jobs:
             type=raw,value=${{ steps.package-version.outputs.version }}
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
-            type=ref,event=pr                                   
+            type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha
 
       - name: Build and push Docker images
         id: build-and-push
