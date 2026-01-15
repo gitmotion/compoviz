@@ -43,6 +43,7 @@ jobs:
       contents: read # allow job to read repo
       packages: write # allow job to publish/write packages (docker images)
       id-token: write # allow job to request idc token for secure auth
+      attestations: write # allow job to create attestations
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6 # v6 for node 24 support and secure git credential storage
